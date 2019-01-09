@@ -22,14 +22,14 @@ def load_properties_for_env(group_var_folder, group_var_file_prefix, environment
     return properties
 
 
-def create_version_html(group_var_folder, group_var_file_prefix, exported_file_path):
-    properties = ''
+def create_version_html(group_var_folder, group_var_file_prefix, serverless_var_file_prefix, exported_file_path):
+    config_data = get_config_data(group_var_file_prefix, group_var_folder)
 
-    properties += load_properties_for_env(group_var_folder, group_var_file_prefix, 'dev')
-    properties += load_properties_for_env(group_var_folder, group_var_file_prefix, 'test')
-    properties += load_properties_for_env(group_var_folder, group_var_file_prefix, 'prod')
+    sls_config_data = get_config_data(serverless_var_file_prefix, group_var_folder + '/serverless')
 
-    config_data = yaml.load(properties)
+    config_data['dev'].update(sls_config_data['dev'])
+    config_data['test'].update(sls_config_data['test'])
+    config_data['prod'].update(sls_config_data['prod'])
 
     all_apps = set()
 
@@ -62,6 +62,15 @@ def create_version_html(group_var_folder, group_var_file_prefix, exported_file_p
     output_file.write(render)
 
 
+def get_config_data(var_prefix, var_folder):
+    properties = ''
+    properties += load_properties_for_env(var_folder, var_prefix, 'dev')
+    properties += load_properties_for_env(var_folder, var_prefix, 'test')
+    properties += load_properties_for_env(var_folder, var_prefix, 'prod')
+    config_data = yaml.load(properties)
+    return config_data
+
+
 def add_env_to_apps_and_version(apps_and_version, environment, apps, config_data):
     if apps in config_data[environment]:
         apps_and_version[apps][environment] = config_data[environment][apps]
@@ -72,6 +81,8 @@ if __name__ == '__main__':
     ap.add_argument("-g", "--group-var-folder", dest='group_var_folder', required=True, help="Group Var folder")
     ap.add_argument("-f", "--group-var-file-prefix", dest='group_var_file_prefix', required=False,
                     help="Group Var env file prefix", default='tag_env_')
+    ap.add_argument("-s", "--serverless-var-file-prefix", dest='serverless_var_file_prefix', required=False,
+                    help="Serverless Var env file prefix", default='')
     ap.add_argument("--force", dest='force', help="Do not ask confirmations", action='store_true')
     ap.add_argument("-e", "--exported-file-path", dest='exported_file_path', required=False,
                     help="Path where to export the html file", default='./compiled-versions.html', )
@@ -85,5 +96,6 @@ if __name__ == '__main__':
             click.echo("Exiting")
             exit(0)
 
-    create_version_html(args.group_var_folder, args.group_var_file_prefix, args.exported_file_path)
+    create_version_html(args.group_var_folder, args.group_var_file_prefix, args.serverless_var_file_prefix,
+                        args.exported_file_path)
     click.echo("All done")
