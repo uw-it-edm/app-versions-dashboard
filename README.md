@@ -9,6 +9,8 @@ Uses python 3
 
 # source venv/bin/activate
 
+# pip install -r requirements.tx
+
 # python buildVersionDashboard.py -h 
 
 usage: buildVersionDashboard.py [-h] -g GROUP_VAR_FOLDER
