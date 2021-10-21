@@ -9,7 +9,7 @@ Uses python 3
 
 # source venv/bin/activate
 
-# pip install -r requirements.tx
+# pip install -r requirements.txt
 
 # python buildVersionDashboard.py -h 
 

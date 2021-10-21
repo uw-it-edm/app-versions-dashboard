@@ -67,7 +67,7 @@ def get_config_data(var_prefix, var_folder):
     properties += load_properties_for_env(var_folder, var_prefix, 'dev')
     properties += load_properties_for_env(var_folder, var_prefix, 'test')
     properties += load_properties_for_env(var_folder, var_prefix, 'prod')
-    config_data = yaml.load(properties)
+    config_data = yaml.safe_load(properties)
     return config_data
 
 
